@@ -25,6 +25,7 @@ SCALE_Y = Gdk.Screen.height() * 1.2 / 1080
 class Bridge:
     def __init__(self, game):
         self.game = game
+        self.game_data = None
         self.screen = game.screen
         self.world = game.world
         self.cost = 0
@@ -38,6 +39,7 @@ class Bridge:
         self.sounds = {"wooo": loadSound("sounds/wooo.wav"),
                        "death": loadSound("sounds/death.wav"),
                        "startup": loadSound("sounds/startup.wav")}
+
 
     def restart(self):
         self.world.run_physics = False

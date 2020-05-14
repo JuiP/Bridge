@@ -17,6 +17,7 @@ License:  GPLv3 http://gplv3.fsf.org/
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+import json
 import pygame
 import pygame.locals
 import pygame.color
@@ -56,6 +57,9 @@ class PhysicsGame:
         self.world.run_physics = False
 
         self.bridge = Bridge(self)
+
+        if self.bridge.game_data is not None:
+            read_file(self, file_path)
         self.bridge.create_world()
 
         self.running = True
@@ -121,6 +125,46 @@ class PhysicsGame:
     def setTool(self, tool):
         self.currentTool.cancel()
         self.currentTool = self.toolList[tool]
+
+    def write_file(self, file_path):
+        #if self.bridge.game_data is not None:
+        # The game parameters are stored in data
+            data = {}
+            self.bridge.game_data = True
+            #data['screen'] = self.bridge.screen
+            #data['world'] = self.bridge.world
+            #data['game_data'] = self.bridge.game_data
+            data['cost'] = self.bridge.cost
+            data['stress'] = self.bridge.stress
+            data['capacity'] = self.bridge.capacity
+            data['first_train'] = self.bridge.first_train
+            data['train_off_screen'] = self.bridge.train_off_screen
+            data['train_was_created'] = self.bridge.train_was_created
+            data['train_exit'] = self.bridge.train_exit
+            data['level_completed'] = self.bridge.level_completed
+
+            f = open(file_path, 'w')
+            try:
+                json.dump(data, f)
+            finally:
+                f.close()
+
+    def read_file(self, file_path):
+       f = open(file_path, 'r')
+       try:
+           data = json.load(f)
+       finally:
+           f.close()
+       #self.bridge.screen = data['screen']
+       #self.bridge.world = data['world']
+       self.bridge.cost = data['cost']
+       self.bridge.stress = data['stress']
+       self.bridge.capacity = data['capacity']
+       self.bridge.first_train = data['first_train']
+       self.bridge.train_off_screen = data['train_off_screen']
+       self.bridge.train_was_created = data['train_was_created']
+       self.bridge.train_exit = data['train_exit']
+       self.bridge.level_completed = data['level_completed']
 
 
 def main():
