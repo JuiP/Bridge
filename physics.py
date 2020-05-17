@@ -53,6 +53,8 @@ class PhysicsGame:
 
         self.box2d_fps = 50
 
+    def set_game_fps(self, fps):
+        self.box2d_fps = fps
 
     def switch_off_fake_pygame_cursor_cb(self, panel, event):
         self.show_fake_cursor = False
