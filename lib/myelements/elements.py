@@ -196,7 +196,7 @@ class Elements:
         """
         self.fixed_color = None
 
-    def get_color(self):
+    def _get_color(self):
         """ Get a color - either the fixed one or the next from self.colors
 
             Return: clr = ((R), (G), (B))
