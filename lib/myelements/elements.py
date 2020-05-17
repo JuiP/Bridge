@@ -64,7 +64,7 @@ class Elements:
     element_count = 0  # Element Count
     renderer = None  # Drawing class (from drawing.py)
     # Default Input in Pixels! (can change to INPUT_METERS)
-    input = INPUT_PIXELS
+    input_unit = INPUT_PIXELS
     line_width = 0  # Line Width in Pixels (0 for fill)
     listener = None
 
