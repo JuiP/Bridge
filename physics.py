@@ -68,7 +68,8 @@ class PhysicsGame:
         additional_data = {
             'trackinfo': self.trackinfo,
             'full_pos_list': self.full_pos_list,
-            'tracked_bodies': self.tracked_bodies
+            'tracked_bodies': self.tracked_bodies,
+            'cost': self.bridge.cost
         }
         self.world.json_save(path, additional_data)
 
@@ -146,6 +147,7 @@ class PhysicsGame:
             path = self.opening_queue.encode('ascii', 'convert')
             if os.path.exists(path):
                self.world.json_load(path)
+               self.bridge.cost = self.world.additional_vars.get('cost', 0)
                #if 'full_pos_list' in self.world.additional_vars:
                    #self.full_pos_list = \
                        #self.world.additional_vars['full_pos_list']
