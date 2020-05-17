@@ -77,6 +77,7 @@ class PhysicsGame:
 
     def run(self):
         self.screen = pygame.display.get_surface()
+        pygame.font.init()
         self.font = pygame.font.Font(None, 42)  # font object
         # self.canvas = olpcgames.ACTIVITY.canvas
         self.joystickobject = None
