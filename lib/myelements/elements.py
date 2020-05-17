@@ -201,9 +201,6 @@ class Elements:
 
             Return: clr = ((R), (G), (B))
         """
-        if self.fixed_color is not None:
-            return self.fixed_color
-
         if self.cur_color == len(self.colors):
             self.cur_color = 0
             shuffle(self.colors)
