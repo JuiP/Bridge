@@ -54,7 +54,6 @@ class PhysicsGame:
         self.box2d_fps = 50
 
     def run(self):
-        pygame.init()
         self.screen = pygame.display.get_surface()
         # get everything set up
         self.clock = pygame.time.Clock()
