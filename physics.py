@@ -53,6 +53,12 @@ class PhysicsGame:
 
         self.box2d_fps = 50
 
+
+    def switch_off_fake_pygame_cursor_cb(self, panel, event):
+        self.show_fake_cursor = False
+
+    def switch_on_fake_pygame_cursor_cb(self, panel, event):
+        self.show_fake_cursor = True
     def run(self):
         self.screen = pygame.display.get_surface()
         self.font = pygame.font.Font(None, 42)  # font object
