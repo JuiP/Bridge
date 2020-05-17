@@ -83,17 +83,19 @@ class PhysicsGame:
         self.font = pygame.font.Font(None, 42)  # font object
         self.debug = True
 
-        # create the name --> instance map for components
-        self.toolList = {}
-        for c in tools.allTools:
-            self.toolList[c.name] = c(self)
-        self.currentTool = self.toolList[tools.allTools[0].name]
 
         # set up the world (instance of Elements)
         self.world = elements.Elements(self.screen.get_size())
         self.world.renderer.set_surface(self.screen)
 
         self.joystickobject = None
+
+        # create the name --> instance map for components
+        self.toolList = {}
+        for c in tools.allTools:
+            self.toolList[c.name] = c(self)
+        self.currentTool = self.toolList[tools.allTools[0].name]
+
         # set up static environment
         self.world.run_physics = False
 
