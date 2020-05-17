@@ -188,18 +188,6 @@ class PhysicsGame:
         self.currentTool.cancel()
         self.currentTool = self.toolList[tool]
 
-    def write_file(self, path):
-        # Saving to journal
-        additional_data = {
-            'trackinfo': self.trackinfo,
-            'full_pos_list': self.full_pos_list,
-            'tracked_bodies': self.tracked_bodies
-        }
-        self.world.json_save(path, additional_data)
-
-    def read_file(self, path):
-        # Loading from journal
-        self.opening_queue = path
 
 def main():
     toolbarheight = 75
