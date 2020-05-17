@@ -81,14 +81,14 @@ class PhysicsGame:
         self.screen = pygame.display.get_surface()
         pygame.font.init()
         self.font = pygame.font.Font(None, 42)  # font object
-        self.debug = True
-
 
         # set up the world (instance of Elements)
         self.world = elements.Elements(self.screen.get_size())
         self.world.renderer.set_surface(self.screen)
 
         self.joystickobject = None
+        self.debug = os.getenv("DEBUG_BRIDGE_SUGAR", False)
+        # FIXME, change to false
 
         # create the name --> instance map for components
         self.toolList = {}
