@@ -78,6 +78,25 @@ class PhysicsGame:
         self.opening_queue = path
 
     def run(self):
+        if self.initialise:
+            self.initialise = False
+
+            # Fake a Sugar cursor for the pyGame canvas area
+            self.show_fake_cursor = True
+            pygame.mouse.set_cursor((8, 8), (0, 0), (0, 0, 0, 0, 0, 0, 0, 0),
+                                    (0, 0, 0, 0, 0, 0, 0, 0))
+
+            cursor_path = os.path.join(os.path.dirname(__file__), 'standardcursor.png')
+            logging.error(cursor_path + "CURS")
+            self.cursor_picture = pygame.image.load(cursor_path)
+            self.cursor_picture.convert_alpha()
+            self.canvas.connect('enter_notify_event',
+                                self.switch_on_fake_pygame_cursor_cb)
+            self.canvas.connect('leave_notify_event',
+                                self.switch_off_fake_pygame_cursor_cb)
+            self.canvas.add_events(Gdk.EventMask.ENTER_NOTIFY_MASK |
+                                   Gdk.EventMask.LEAVE_NOTIFY_MASK)
+
         self.screen = pygame.display.get_surface()
         pygame.font.init()
         self.font = pygame.font.Font(None, 42)  # font object
