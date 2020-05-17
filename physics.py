@@ -81,7 +81,6 @@ class PhysicsGame:
         self.screen = pygame.display.get_surface()
         pygame.font.init()
         self.font = pygame.font.Font(None, 42)  # font object
-        self.joystickobject = None
         self.debug = True
 
         # create the name --> instance map for components
@@ -94,6 +93,7 @@ class PhysicsGame:
         self.world = elements.Elements(self.screen.get_size())
         self.world.renderer.set_surface(self.screen)
 
+        self.joystickobject = None
         # set up static environment
         self.world.run_physics = False
 
