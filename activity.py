@@ -47,16 +47,16 @@ class BridgeActivity(Activity):
 
         self.game = physics.PhysicsGame(activity=self)
         self.build_toolbar()
-        self._pygamecanvas = sugargame.canvas.PygameCanvas(self,
+        self.game.canvas = sugargame.canvas.PygameCanvas(self,
                              main=self.game.run,
                              modules=[pygame.display])
 
         w = Gdk.Screen.width()
         h = Gdk.Screen.height() - 2 * GRID_CELL_SIZE
-        self._pygamecanvas.set_size_request(w, h)
+        self.game.canvas.set_size_request(w, h)
 
-        self.set_canvas(self._pygamecanvas)
-        self._pygamecanvas.grab_focus()
+        self.set_canvas(self.game.canvas)
+        self.game.canvas.grab_focus()
 
     def build_toolbar(self):
         self.max_participants = 1
@@ -103,4 +103,4 @@ class BridgeActivity(Activity):
         self.game.write_file(file_path)
 
     def get_preview(self):
-        return self._pygamecanvas.get_preview()
+        return self.game.canvas.get_preview()
