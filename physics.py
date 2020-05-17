@@ -59,6 +59,22 @@ class PhysicsGame:
 
     def switch_on_fake_pygame_cursor_cb(self, panel, event):
         self.show_fake_cursor = True
+
+    def write_file(self, path):
+        # Saving to journal
+        logging.debug("write_file called")
+        additional_data = {
+            'trackinfo': self.trackinfo,
+            'full_pos_list': self.full_pos_list,
+            'tracked_bodies': self.tracked_bodies
+        }
+        self.world.json_save(path, additional_data)
+
+    def read_file(self, path):
+        # Loading from journal
+        logging.debug("read_file called")
+        self.opening_queue = path
+
     def run(self):
         self.screen = pygame.display.get_surface()
         self.font = pygame.font.Font(None, 42)  # font object
