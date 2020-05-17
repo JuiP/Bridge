@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import pygame
+import logging
 from gi.repository import Gdk
 
 SCALE_X = Gdk.Screen.width() * 1.5 / 1920
@@ -182,6 +183,8 @@ class Bridge:
             if len(ftrain) and len(btrain):
                 self.world.add.distanceJoint(
                     btrain[0], ftrain[0], backlink, frontlink)
+
+
 
 # function for loading sounds (mostly borrowed from
 # Pete Shinners pygame tutorial)
