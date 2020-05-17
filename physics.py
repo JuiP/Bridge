@@ -173,6 +173,10 @@ class PhysicsGame:
                     True, (0, 0, 0))
             textpos = text.get_rect(left=12, top=94)
             self.screen.blit(text, textpos)
+            # Show Sugar like cursor for UI consistancy
+            if self.show_fake_cursor:
+                self.screen.blit(self.cursor_picture,
+                                    pygame.mouse.get_pos())
 
             # Flip Display
             pygame.display.flip()
