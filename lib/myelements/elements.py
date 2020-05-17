@@ -56,15 +56,16 @@ from . import camera
 
 
 class Elements:
+
     """The class which handles all interaction with the box2d engine
     """
     # Settings
-    run_physics = True           # Can pause the simulation
-    element_count = 0              # Element Count
-    renderer = None           # Drawing class (from drawing.py)
+    run_physics = True  # Can pause the simulation
+    element_count = 0  # Element Count
+    renderer = None  # Drawing class (from drawing.py)
     # Default Input in Pixels! (can change to INPUT_METERS)
     input = INPUT_PIXELS
-    line_width = 0              # Line Width in Pixels (0 for fill)
+    line_width = 0  # Line Width in Pixels (0 for fill)
     listener = None
 
     # Offset screen from world coordinate system (x, y) [meter5]
