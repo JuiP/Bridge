@@ -559,11 +559,26 @@ class Elements:
         controllerlist = []
         worldmodel['controllerlist'] = controllerlist
 
+        if serialize:
+            addvars = additional_vars
+            trackinfo = addvars['trackinfo']
+            backup = trackinfo
+            for key, info in backup.items():
+                if not info[3]:
+                    try:
+                        trackinfo[key][0] = info[0].userData['saveid']
+                        trackinfo[key][1] = info[1].userData['saveid']
+                    except AttributeError:
+                        pass
+                else:
+                    addvars['trackinfo'][key][0] = None
+                    addvars['trackinfo'][key][1] = None
+
+            additional_vars['trackinfo'] = trackinfo
+
         worldmodel['additional_vars'] = additional_vars
 
-        f = open(path, 'w')
-        f.write(json.dumps(worldmodel))
-        f.close()
+        return worldmodel
 
     def json_load(self, path, serialized=False):
         import json
