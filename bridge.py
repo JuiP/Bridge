@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import pygame
+import logging
 from gi.repository import Gdk
 
 SCALE_X = Gdk.Screen.width() * 1.5 / 1920
@@ -65,15 +66,15 @@ class Bridge:
 
     def add_cost(self, value):
         self.cost = self.cost + value
-        print("cost now", value)
+        logging.info("cost now", value)
 
     def joint_added(self, joint):
-        print("joint added!")
+        logging.info("joint added!")
         self.add_cost(100)
         self.capacity += 500
 
     def joint_deleted(self, joint):
-        print("joint deleting!")
+        logging.info("joint deleting!")
         if self.cost > 0:
             self.add_cost(-100)
         self.capacity -= 500
@@ -98,7 +99,7 @@ class Bridge:
                     self.stress += force
 
                     if force > 500:
-                        print("destroy joint!")
+                        logging.info("destroy joint!")
                         self.world.world.DestroyJoint(j)
                         self.capacity -= 500
                     else:
@@ -121,7 +122,7 @@ class Bridge:
         elif pos.y < 0.0:
             if not self.train_off_screen:
                 self.sounds['death'].play()
-                print("TRAIN FELL OFF!", pos.x)
+                logging.info("TRAIN FELL OFF!", pos.x)
                 self.train_off_screen = True
 
     def create_train(self, worldpoint=(int(1600 * SCALE_X),
@@ -183,6 +184,8 @@ class Bridge:
                 self.world.add.distanceJoint(
                     btrain[0], ftrain[0], backlink, frontlink)
 
+
+
 # function for loading sounds (mostly borrowed from
 # Pete Shinners pygame tutorial)
 
@@ -201,7 +204,10 @@ def loadSound(name):
         return NoneSound()
     try:
         sound = pygame.mixer.Sound(name)
-    except Exception:
-        print("error with sound: " + name)
+    except Exception as e:
+        logging.error(
+            "error with sound: {}. Error: {}"
+                .format(name, e)
+        )
         return NoneSound()
     return sound

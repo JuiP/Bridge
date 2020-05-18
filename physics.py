@@ -14,38 +14,102 @@ Code:   http://dev.laptop.org/git?p=activities/physics
 License:  GPLv3 http://gplv3.fsf.org/
 """
 import os
+from gettext import gettext as _
+import logging
 
-import gi
-gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-import pygame
-import pygame.locals
-import pygame.color
+from gi.repository import Gdk
 
-from myelements import elements
+import pygame
+from pygame.locals import MOUSEBUTTONUP
+
+import Box2D as box2d
+from lib.myelements import elements
+
 import tools
 from bridge import Bridge
-from gettext import gettext as _
 
 
 class PhysicsGame:
-    def __init__(self):
+    def __init__(self, activity=None):
+        self.activity = activity
+        # Get everything set up
+        self.clock = pygame.time.Clock()
+        self.in_focus = True
+        # Create the name --> instance map for components
+        self.toolList = {}
+        for c in tools.allTools:
+            self.toolList[c.name] = c(self)
+        self.currentTool = self.toolList[tools.allTools[0].name]
+        # Set up the world (instance of Elements)
+        self.box2d = box2d
         self.opening_queue = None
+        self.running = True
+        self.initialise = True
 
         self.full_pos_list = []
         self.tracked_bodies = 0
 
         self.trackinfo = {}
 
+        self.box2d_fps = 50
+
+    def set_game_fps(self, fps):
+        self.box2d_fps = fps
+
+    def switch_off_fake_pygame_cursor_cb(self, panel, event):
+        self.show_fake_cursor = False
+
+    def switch_on_fake_pygame_cursor_cb(self, panel, event):
+        self.show_fake_cursor = True
+
+    def write_file(self, path):
+        # Saving to journal
+        logging.debug("write_file called")
+        additional_data = {
+            'trackinfo': self.trackinfo,
+            'full_pos_list': self.full_pos_list,
+            'tracked_bodies': self.tracked_bodies,
+            'cost': self.bridge.cost
+        }
+        self.world.json_save(path, additional_data)
+
+    def read_file(self, path):
+        # Loading from journal
+        logging.debug("read_file called")
+        self.opening_queue = path
+
     def run(self):
-        pygame.init()
+        if self.initialise:
+            self.initialise = False
+
+            # Fake a Sugar cursor for the pyGame canvas area
+            self.show_fake_cursor = True
+            pygame.mouse.set_cursor((8, 8), (0, 0), (0, 0, 0, 0, 0, 0, 0, 0),
+                                    (0, 0, 0, 0, 0, 0, 0, 0))
+
+            cursor_path = os.path.join(os.path.dirname(__file__), 'standardcursor.png')
+            logging.error(cursor_path + "CURS")
+            self.cursor_picture = pygame.image.load(cursor_path)
+            self.cursor_picture.convert_alpha()
+            self.canvas.connect('enter_notify_event',
+                                self.switch_on_fake_pygame_cursor_cb)
+            self.canvas.connect('leave_notify_event',
+                                self.switch_off_fake_pygame_cursor_cb)
+            self.canvas.add_events(Gdk.EventMask.ENTER_NOTIFY_MASK |
+                                   Gdk.EventMask.LEAVE_NOTIFY_MASK)
+
         self.screen = pygame.display.get_surface()
-        # get everything set up
-        self.clock = pygame.time.Clock()
+        pygame.font.init()
         self.font = pygame.font.Font(None, 42)  # font object
-        # self.canvas = olpcgames.ACTIVITY.canvas
+
+        # set up the world (instance of Elements)
+        self.world = elements.Elements(self.screen.get_size())
+        self.world.renderer.set_surface(self.screen)
+
         self.joystickobject = None
-        self.debug = True
+        self.debug = os.getenv("DEBUG_BRIDGE_SUGAR", False)
+        # FIXME, change to false
 
         # create the name --> instance map for components
         self.toolList = {}
@@ -53,12 +117,26 @@ class PhysicsGame:
             self.toolList[c.name] = c(self)
         self.currentTool = self.toolList[tools.allTools[0].name]
 
-        # set up the world (instance of Elements)
-        self.world = elements.Elements(self.screen.get_size())
-        self.world.renderer.set_surface(self.screen)
-
         # set up static environment
         self.world.run_physics = False
+
+        # provided there is a file to call from
+        # We need to place each element in the json
+        # to their correct position before generating
+        # The ground
+        if self.opening_queue:
+            path = self.opening_queue.encode('ascii', 'convert')
+            if os.path.exists(path):
+                self.world.json_load(path, serialized=True)
+                if 'full_pos_list' in self.world.additional_vars:
+                    self.full_pos_list = \
+                        self.world.additional_vars['full_pos_list']
+                if 'trackinfo' in self.world.additional_vars:
+                    self.trackinfo = self.world.additional_vars['trackinfo']
+                if 'tracked_bodies' in self.world.additional_vars:
+                    self.tracked_bodies = \
+                        self.world.additional_vars['tracked_bodies']
+
 
         self.bridge = Bridge(self)
         self.bridge.create_world()
@@ -70,6 +148,7 @@ class PhysicsGame:
             path = self.opening_queue.encode('ascii', 'convert')
             if os.path.exists(path):
                self.world.json_load(path)
+               self.bridge.cost = self.world.additional_vars.get('cost', 0)
                #if 'full_pos_list' in self.world.additional_vars:
                    #self.full_pos_list = \
                        #self.world.additional_vars['full_pos_list']
@@ -89,7 +168,17 @@ class PhysicsGame:
                 break
 
             for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return
+                elif event.type == pygame.VIDEORESIZE:
+                    pygame.display.set_mode(event.size, pygame.RESIZABLE)
+
                 self.currentTool.handleEvents(event, self.bridge)
+                # Show the mouse again on mouse up
+                if event.type == MOUSEBUTTONUP:
+                    # if event.button == 1:
+                    self.show_fake_cursor = True
+
             # Clear Display
             self.screen.fill((80, 160, 240))  # 255 for white
 
@@ -159,6 +248,11 @@ class PhysicsGame:
             textpos = text.get_rect(left=12, top=94)
             self.screen.blit(text, textpos)
 
+            # Show Sugar like cursor for UI consistancy
+            if self.show_fake_cursor:
+                self.screen.blit(self.cursor_picture,
+                                    pygame.mouse.get_pos())
+
             # Flip Display
             pygame.display.flip()
 
@@ -169,18 +263,6 @@ class PhysicsGame:
         self.currentTool.cancel()
         self.currentTool = self.toolList[tool]
 
-    def write_file(self, path):
-        # Saving to journal
-        additional_data = {
-            'trackinfo': self.trackinfo,
-            'full_pos_list': self.full_pos_list,
-            'tracked_bodies': self.tracked_bodies
-        }
-        self.world.json_save(path, additional_data)
-
-    def read_file(self, path):
-        # Loading from journal
-        self.opening_queue = path
 
 def main():
     toolbarheight = 75
