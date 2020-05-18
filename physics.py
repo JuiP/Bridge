@@ -14,20 +14,21 @@ Code:   http://dev.laptop.org/git?p=activities/physics
 License:  GPLv3 http://gplv3.fsf.org/
 """
 import os
-
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
-from gi.repository import Gdk
-import pygame
-import pygame.locals
-import pygame.color
-import Box2D as box2d
-from myelements import elements
-import tools
-from bridge import Bridge
 from gettext import gettext as _
 import logging
+
+from gi.repository import Gtk
+from gi.repository import Gdk
+
+import pygame
+from pygame.locals import MOUSEBUTTONUP
+
+import Box2D as box2d
+from lib.myelements import elements
+
+import tools
+from bridge import Bridge
+
 
 class PhysicsGame:
     def __init__(self, activity=None):
