@@ -168,7 +168,17 @@ class PhysicsGame:
                 break
 
             for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return
+                elif event.type == pygame.VIDEORESIZE:
+                    pygame.display.set_mode(event.size, pygame.RESIZABLE)
+
                 self.currentTool.handleEvents(event, self.bridge)
+                # Show the mouse again on mouse up
+                if event.type == MOUSEBUTTONUP:
+                    # if event.button == 1:
+                    self.show_fake_cursor = True
+
             # Clear Display
             self.screen.fill((80, 160, 240))  # 255 for white
 
